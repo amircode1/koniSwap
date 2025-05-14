@@ -1,0 +1,61 @@
+# -------------
+# 🔧 Variables
+# -------------
+
+SRC_DIR := src
+OUT_DIR := out
+TEST_DIR := test
+BUILD_INFO := build-info
+BROADCAST := broadcast
+SCRIPT_DIR := script
+
+# -------------
+# 🛠️ Commands
+# -------------
+
+# 📦 Build all contracts
+build:
+	forge build --out $(OUT_DIR) --build-info --via-ir
+
+# 🧪 Run tests (unit + fuzz + invariant)
+test:
+	forge test -vv
+
+# 🧪 Run specific test file: make test-file FILE=MyTest.t.sol
+test-file:
+	forge test -vv --match-path $(TEST_DIR)/$(FILE)
+
+# 🚀 Deploy to local anvil
+deploy:
+	forge script $(SCRIPT_DIR)/Deploy.s.sol --fork-url http://localhost:8545 --broadcast --verify -vvvv
+
+# 🚀 Deploy to any RPC: make deploy-url URL=https://rpc-url
+deploy-url:
+	forge script $(SCRIPT_DIR)/Deploy.s.sol --rpc-url $(URL) --broadcast -vvvv
+
+# 🔬 Inspect size of contracts
+size:
+	forge size
+
+# 💡 Generate coverage report
+coverage:
+	forge coverage
+# 🧹 Clean build artifacts
+clean:
+	forge clean
+
+# ⚙️ Anvil local node
+anvil:
+	anvil -p 8545 --block-time 1
+
+# 🔁 Watch contract changes and rebuild automatically
+watch:
+	fswatch -o $(SRC_DIR) | xargs -n1 -I{} make build
+
+# 🆔 Check contract ABI
+abi:
+	forge inspect $(CONTRACT) abi
+
+# 📄 Flatten contract
+flatten:
+	forge flatten $(SRC_DIR)/$(CONTRACT).sol > flat/$(CONTRACT).flat.sol
